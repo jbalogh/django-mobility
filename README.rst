@@ -32,8 +32,8 @@ These are the default settings::
 You need these middleware (but see the User Agent caveats below)::
 
     MIDDLEWARE_CLASSES = (
-        'mobile.middleware.DetectMobileMiddleware',
-        'mobile.middleware.XMobileMiddleware',
+        'mobility.middleware.DetectMobileMiddleware',
+        'mobility.middleware.XMobileMiddleware',
     )
 
 
