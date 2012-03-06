@@ -49,6 +49,14 @@ class TestDetectMobile(unittest.TestCase):
     def test_no_ua(self):
         self.check(mobile=False)
 
+    def test_vary(self):
+        request = test.RequestFactory().get('/')
+        response = http.HttpResponse()
+        r = middleware.DetectMobileMiddleware().process_response(request,
+                                                                 response)
+        assert r is response
+        self.assertEqual(response['Vary'], 'User-Agent')
+
 
 class TestXMobile(unittest.TestCase):
 
@@ -103,16 +111,32 @@ class TestMobilized(unittest.TestCase):
 class TestNotMobilized(unittest.TestCase):
 
     def setUp(self):
-        normal = lambda r: getattr(r, 'NO_MOBILE', False)
-        self.view = decorators.not_mobilized(normal)
-        self.plain_view = normal
+        self.view = lambda r: getattr(r, 'NO_MOBILE', False)
         self.request = test.RequestFactory().get('/')
 
     def test_call_normal(self):
-        self.assertEqual(self.plain_view(self.request), False)
+        self.assertEqual(self.view(self.request), False)
 
     def test_call_nonmobile(self):
-        self.assertEqual(self.view(self.request), True)
+        view = decorators.not_mobilized(self.view)
+        self.assertEqual(view(self.request), True)
+
+    def test_vary_xmobile(self):
+        request = test.RequestFactory().get('/')
+        request.NO_MOBILE = True
+        response = http.HttpResponse()
+
+        r = middleware.XMobileMiddleware().process_response(request, response)
+        self.assertEqual(response.get('Vary', None), None)
+
+    def test_vary_detect_mobile(self):
+        request = test.RequestFactory().get('/')
+        request.NO_MOBILE = True
+        response = http.HttpResponse()
+
+        r = middleware.DetectMobileMiddleware().process_response(request,
+                                                                 response)
+        self.assertEqual(response.get('Vary', None), None)
 
 
 class TestMobileTemplate(unittest.TestCase):
