@@ -53,7 +53,8 @@ def mobilized(normal_fn):
 
 def not_mobilized(f):
     """
-    Explicitly mark this function as not mobilized. If marked, Vary headers will not be sent.
+    Explicitly mark this function as not mobilized. If marked,
+    Vary headers will not be sent.
     """
     @functools.wraps(f)
     def wrapper(request, *args, **kw):

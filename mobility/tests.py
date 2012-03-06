@@ -2,7 +2,6 @@
 import unittest
 
 from django import http, test
-from django.conf import settings
 from django.utils import http as urllib
 
 from mobility import decorators, middleware
@@ -99,6 +98,21 @@ class TestMobilized(unittest.TestCase):
     def test_call_mobile(self):
         self.request.MOBILE = True
         self.assertEqual(self.view(self.request), 'mobile')
+
+
+class TestNotMobilized(unittest.TestCase):
+
+    def setUp(self):
+        normal = lambda r: getattr(r, 'NO_MOBILE', False)
+        self.view = decorators.not_mobilized(normal)
+        self.plain_view = normal
+        self.request = test.RequestFactory().get('/')
+
+    def test_call_normal(self):
+        self.assertEqual(self.plain_view(self.request), False)
+
+    def test_call_nonmobile(self):
+        self.assertEqual(self.view(self.request), True)
 
 
 class TestMobileTemplate(unittest.TestCase):
