@@ -49,3 +49,14 @@ def mobilized(normal_fn):
                 return normal_fn(request, *args, **kw)
         return wrapper
     return decorator
+
+
+def not_mobilized(f):
+    """
+    Explicitly mark this function as not mobilized. If marked, Vary headers will not be sent.
+    """
+    @functools.wraps(f)
+    def wrapper(request, *args, **kw):
+        request.NO_MOBILE = True
+        return f(request, *args, **kw)
+    return wrapper

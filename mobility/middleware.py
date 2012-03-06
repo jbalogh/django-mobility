@@ -24,7 +24,8 @@ class DetectMobileMiddleware(object):
             request.META['HTTP_X_MOBILE'] = '1'
 
     def process_response(self, request, response):
-        patch_vary_headers(response, ['User-Agent'])
+        if not getattr(request, 'NO_MOBILE', False):
+            patch_vary_headers(response, ['User-Agent'])
         return response
 
 
@@ -46,5 +47,6 @@ class XMobileMiddleware(object):
         request.MOBILE = want_mobile
 
     def process_response(self, request, response):
-        patch_vary_headers(response, ['X-Mobile'])
+        if not getattr(request, 'NO_MOBILE', False):
+            patch_vary_headers(response, ['X-Mobile'])
         return response
